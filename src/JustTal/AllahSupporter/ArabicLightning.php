@@ -58,4 +58,17 @@ class ArabicLightning extends Entity
 	public static function getNetworkTypeId() : string{
 		return EntityIds::LIGHTNING_BOLT;
 	}
+
+	public function initEntity(CompoundTag $nbt): void {
+		parent::initEntity($nbt);
+		if($nbt->getTag("Scale") !== null){
+			$this->setScale($nbt->getFloat("Scale"));
+		}
+	}
+
+	public function saveNBT(): CompoundTag{
+		$nbt = parent::saveNBT();
+		$nbt->setFloat("Scale", $this->scale);
+		return $nbt;
+	}
 }
