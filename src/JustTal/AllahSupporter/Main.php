@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace JustTal\AllahSupporter;
 
-use Heisenburger69\BurgerSpawners\entities\Bat;
 use JsonException;
 use pocketmine\entity\EntityDataHelper;
 use pocketmine\entity\EntityFactory;
@@ -55,8 +54,8 @@ class Main extends PluginBase implements Listener {
         $this->getServer()->getPluginManager()->registerEvents($this, $this);
 
 		$entityClass = ArabicLightning::class;// more to come! >:]
-		(new EntityFactory)->register($entityClass, function(World $world, CompoundTag $nbt) : Bat{
-			return new Bat(EntityDataHelper::parseLocation($nbt, $world), $nbt);
+		(new EntityFactory)->register($entityClass, function(World $world, CompoundTag $nbt) :  ArabicLightning{
+			return new ArabicLightning(EntityDataHelper::parseLocation($nbt, $world), $nbt);
 		}, ['Lightning', 'minecraft:bat']);
 	}
 
@@ -126,7 +125,7 @@ class Main extends PluginBase implements Listener {
             }
 
             foreach ($player->getServer()->getOnlinePlayers() as $p) {
-                $p->sendDataPacket($packet);
+                $p->getNetworkSession()->sendDataPacket($packet);
             }
 
             $this->getScheduler()->scheduleDelayedTask(new ClosureTask(function () use ($player) : void {
