@@ -4,26 +4,27 @@ declare(strict_types=1);
 
 namespace JustTal\AllahSupporter;
 
-use pocketmine\block\Block;
+use JetBrains\PhpStorm\Pure;
 use pocketmine\entity\Entity;
-use pocketmine\entity\EntityIds;
+use pocketmine\entity\EntitySizeInfo;
 use pocketmine\entity\Living;
 use pocketmine\event\entity\EntityCombustByEntityEvent;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
-use pocketmine\Player;
+use pocketmine\nbt\tag\CompoundTag;
+use pocketmine\network\mcpe\protocol\types\entity\EntityIds;
+use pocketmine\player\Player;
 
 class ArabicLightning extends Entity
 {
-    const NETWORK_ID = EntityIds::LIGHTNING_BOLT;
     /** @var float */
-    public $width = 0.3;
+    public float $width = 0.3;
     /** @var float */
-    public $length = 0.9;
+    public float $length = 0.9;
     /** @var float */
-    public $height = 1.8;
+    public float $height = 1.8;
     /** @var int */
-    protected $age = 0;
+    protected int $age = 0;
 
     public function entityBaseTick(int $tickDiff = 1): bool
     {
@@ -32,7 +33,7 @@ class ArabicLightning extends Entity
         }
         $this->age += $tickDiff;
         $hasUpdate = parent::entityBaseTick($tickDiff);
-        foreach ($this->getLevel()->getNearbyEntities($this->getBoundingBox()->expandedCopy(4, 3, 4), $this) as $entity) {
+        foreach ($this->getWorld()->getNearbyEntities($this->getBoundingBox()->expandedCopy(4, 3, 4), $this) as $entity) {
             if ($entity instanceof Living && $entity->isAlive()) {
                 $owner = $this->getOwningEntity();
                 if (!$owner instanceof Player) {
@@ -50,4 +51,25 @@ class ArabicLightning extends Entity
         }
         return $hasUpdate;
     }
+
+	#[Pure] protected function getInitialSizeInfo() : EntitySizeInfo{
+		return new EntitySizeInfo($this->height, $this->width);
+	}
+
+	public static function getNetworkTypeId() : string{
+		return EntityIds::LIGHTNING_BOLT;
+	}
+
+	public function initEntity(CompoundTag $nbt): void {
+		parent::initEntity($nbt);
+		if($nbt->getTag("Scale") !== null){
+			$this->setScale($nbt->getFloat("Scale"));
+		}
+	}
+
+	public function saveNBT(): CompoundTag{
+		$nbt = parent::saveNBT();
+		$nbt->setFloat("Scale", $this->scale);
+		return $nbt;
+	}
 }
