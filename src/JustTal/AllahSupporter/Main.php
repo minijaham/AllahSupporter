@@ -43,15 +43,15 @@ class Main extends PluginBase implements Listener {
 	 * @throws ReflectionException
 	 */
 	public function onEnable() : void {
-        $this->saveResource("skin.png", true);
-        $this->saveResource("geometry.json", true);
-        $this->saveResource("resource.mcpack", true);
+        	$this->saveResource("skin.png", true);
+        	$this->saveResource("geometry.json", true);
+        	$this->saveResource("resource.mcpack", true);
 
-        $this->loadPack();
+        	$this->loadPack();
 
-        $this->skin = new Skin("penguin", $this->toBytes(imagecreatefrompng($this->getDataFolder() . "skin.png")), "", "geometry.penguin", file_get_contents($this->getDataFolder() . "geometry.json"));
+        	$this->skin = new Skin("penguin", $this->toBytes(imagecreatefrompng($this->getDataFolder() . "skin.png")), "", "geometry.penguin", file_get_contents($this->getDataFolder() . "geometry.json"));
 
-        $this->getServer()->getPluginManager()->registerEvents($this, $this);
+        	$this->getServer()->getPluginManager()->registerEvents($this, $this);
 
 		$entityClass = ArabicLightning::class;// more to come! >:]
 		(new EntityFactory)->register($entityClass, function(World $world, CompoundTag $nbt) :  ArabicLightning{
@@ -63,27 +63,27 @@ class Main extends PluginBase implements Listener {
 	 * @throws ReflectionException
 	 */
 	public function loadPack() : void {
-        $manager = $this->getServer()->getResourcePackManager();
-        $pack = new ZippedResourcePack($this->getDataFolder() . "resource.mcpack");
+        	$manager = $this->getServer()->getResourcePackManager();
+        	$pack = new ZippedResourcePack($this->getDataFolder() . "resource.mcpack");
 
-        $reflection = new ReflectionClass($manager);
+        	$reflection = new ReflectionClass($manager);
 
-        $property = $reflection->getProperty("resourcePacks");
-        $property->setAccessible(true);
+        	$property = $reflection->getProperty("resourcePacks");
+        	$property->setAccessible(true);
 
-        $currentResourcePacks = $property->getValue($manager);
-        $currentResourcePacks[] = $pack;
-        $property->setValue($manager, $currentResourcePacks);
+        	$currentResourcePacks = $property->getValue($manager);
+        	$currentResourcePacks[] = $pack;
+        	$property->setValue($manager, $currentResourcePacks);
 
-        $property = $reflection->getProperty("uuidList");
-        $property->setAccessible(true);
-        $currentUUIDPacks = $property->getValue($manager);
-        $currentUUIDPacks[strtolower($pack->getPackId())] = $pack;
-        $property->setValue($manager, $currentUUIDPacks);
+        	$property = $reflection->getProperty("uuidList");
+        	$property->setAccessible(true);
+        	$currentUUIDPacks = $property->getValue($manager);
+        	$currentUUIDPacks[strtolower($pack->getPackId())] = $pack;
+        	$property->setValue($manager, $currentUUIDPacks);
 
-        $property = $reflection->getProperty("serverForceResources");
-        $property->setAccessible(true);
-        $property->setValue($manager, true);
+        	$property = $reflection->getProperty("serverForceResources");
+        	$property->setAccessible(true);
+        	$property->setValue($manager, true);
     }
 
     public function onJoin(PlayerJoinEvent $event) : void {
@@ -107,19 +107,19 @@ class Main extends PluginBase implements Listener {
             $packet->volume = 100;
             $packet->pitch = 1;
 			
-	    	$entities = $player->getWorld()->getNearbyEntities($player->getBoundingBox()->expandedCopy(20, 20, 20), $player);
+	    $entities = $player->getWorld()->getNearbyEntities($player->getBoundingBox()->expandedCopy(20, 20, 20), $player);
             foreach ($entities as $entity) {
                 if ($entity instanceof Projectile) {
-					if ($entity->getOwningEntity() !== $player) {
+			if ($entity->getOwningEntity() !== $player) {
                 		$entity->setMotion($entity->getMotion()->multiply(-1));
             		}
-				} else {
-					if (!$entity instanceof ItemEntity && !$entity instanceof ExperienceOrb && !isset($entity->saveNBT()->getValue()["SlapperVersion"])) {
-						$this->getScheduler()->scheduleDelayedTask(new ClosureTask(function () use ($player, $entity) : void {
-							$lightning = new ArabicLightning($player->getLocation());
-							$lightning->setOwningEntity($player);
-							$lightning->spawnToAll();
-						}), 30);
+		} else {
+			if (!$entity instanceof ItemEntity && !$entity instanceof ExperienceOrb && !isset($entity->saveNBT()->getValue()["SlapperVersion"])) {
+				$this->getScheduler()->scheduleDelayedTask(new ClosureTask(function () use ($player, $entity) : void {
+					$lightning = new ArabicLightning($player->getLocation());
+					$lightning->setOwningEntity($player);
+					$lightning->spawnToAll();
+				}), 30);
                     }
                 }
             }
